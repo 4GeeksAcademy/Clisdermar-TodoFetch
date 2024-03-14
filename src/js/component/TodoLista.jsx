@@ -62,12 +62,17 @@ const putList= async()=>{
       } catch (error){ console.error(error)}
 
 }
-
-const handleDelete = (index) => {
-  const updatedTasks = [...tasksList];
-  updatedTasks.splice(index, 1);
+const handleDelete = (taskId) => {
+   const updatedTasks = tasksList.filter(task => task.label !== taskId);
+  updatedTasks.splice(taskId, 0);
   setTasksList(updatedTasks);
 };
+
+// const handleDelete = (index) => {
+//   const updatedTasks = [...tasksList];
+//   updatedTasks.splice(index, 1);
+//   setTasksList(updatedTasks);
+// };
 
 const handleDeleteAllTasks = async () => {
   try {
@@ -127,7 +132,7 @@ useEffect (()=> {
                 {taskItem.label}
 
                 {hoveredIndex === index && (
-                  <button className="delete-button" onClick={() => handleDelete(taskItem.id, index)}>
+                  <button className="delete-button" onClick={() => handleDelete(taskItem.label)}>
                     <FontAwesomeIcon icon={faTimes} style={{ color: '#f03405' }} />
                   </button>
                   
