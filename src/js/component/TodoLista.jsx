@@ -66,8 +66,6 @@ const TodoLista = () => {
 		}
 	}
 
-
-
 	const deleteReinicio = async () => {
 		try {
 			const resp = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
@@ -88,8 +86,11 @@ const TodoLista = () => {
 
 
 
-	return <>
+	return (
+		<div className="container">
+			<div>
 		<h1 className="title text-center mt-5">Todos</h1>
+		</div>
 		<Card className="d-flex" body>
 			<div className="row m-3">
 				<input className="inputEdit col-12" onKeyUp={async (evt) => {
@@ -123,11 +124,12 @@ const TodoLista = () => {
 
 			<div>
 				<span className="m-5">{lista.length -1} Item left</span>
-				<Button className="ms-5" variant="primary" onClick={deleteReinicio} >Delete all</Button>
+				<Button className="ms-5" variant="success" onClick={deleteReinicio} >Delete all</Button>
 			</div>
 		</Card >
-
-	</>
+		</div>
+	)
+	
 };
 
 export default TodoLista;
