@@ -62,11 +62,13 @@ const putList= async()=>{
       } catch (error){ console.error(error)}
 
 }
+//para eliminar una tarea
 const handleDelete = (taskId) => {
    const updatedTasks = tasksList.filter(task => task.label !== taskId);
   updatedTasks.splice(taskId, 0);
   setTasksList(updatedTasks);
 };
+
 
 // const handleDelete = (index) => {
 //   const updatedTasks = [...tasksList];
