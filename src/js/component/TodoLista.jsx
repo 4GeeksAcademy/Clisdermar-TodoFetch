@@ -1,161 +1,133 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect } from "react";
+import { useState } from "react";
+
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+
+
 
 const TodoLista = () => {
-  const [user,setUser] = useState('');
-  const [task, setTask] = useState({
-    label:"",
-    done: false
-  });
-  const [tasksList, setTasksList] = useState([]);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+	const [hover, setHover] = useState(false)
+	const [lista, setLista] = useState([{
+		"label": "",
+		"done": false
+	}])
 
 
-  const handleAdd = (event) => {
-    if(event.key === 'Enter'){
-       setTask(event.target.value)
-      };
-  };
-   
-  const getTasksLista = async ()=>{
-    try{
-      const response = await fetch ('https://playground.4geeks.com/apis/fake/todos/user/clisdermar')
-      const data = await response.json()
-      setTasksList(data);
-    }catch(error){
-      console.error('Error fetching tasks:', error);
-    }
-  }
+
+	const ApiFuntion = async () => {
+		try {
+			const resp = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
+				method: "GET"
+			});
+			const data = await resp.json();
+			console.log(resp)
+			setLista(data)
+
+		} catch (error) {
+			console.log(`este es el ${error}`);
+		}
+	}
+
+	useEffect(() => {
+		ApiFuntion();
+	}, [])
+
+	const agregartarea = async (nuevalista) => {
+		try {
+			const resp = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
+				method: "PUT",
+				body: JSON.stringify(nuevalista),
+				headers: {
+					"Content-Type": "application/json"
+				}
+			});
+			const data = await resp.json();
+			setLista(nuevalista);
+		} catch (error) {
+			console.log(`este es el ${error}`);
+		}
+	}
+
+	const borrarTarea = async (ind) => {
+		const menosUnaTarea = lista.filter((obj, index) => ind != index)
+		try {
+			const resp = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
+				method: "PUT",
+				body: JSON.stringify(menosUnaTarea),
+				headers: {
+					"Content-Type": "application/json"
+				}
+			});
+			const data = await resp.json();
+			setLista(menosUnaTarea);
+		} catch (error) {
+			console.log(`este es el ${error}`);
+		}
+	}
 
 
-  const AddTask = (e) => {
-    e.preventDefault();
-    if (task.label.trim() !== '') {
-      setTasksList((prevList) => {
-        return [task, ...prevList];
-      });
-      setTask({ label: '', done: false }); // Limpia el input después de agregar la tarea
-    }
-  };
-   const handleChange = (event)=>{
-    setTask({ ...task, "label": event.target.value})
-    console.log(task)
-   }
 
-const putList= async()=>{
-      try{
-        const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/clisdermar',{
-          method: "PUT",
-          body: JSON.stringify(tasksList),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-        const data = await response.json()
-        console.log(data)
-        if(!response.ok){
-          throw new Error(data.msg)
-        }
+	const deleteReinicio = async () => {
+		try {
+			const resp = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
+				method: "PUT",
+				body: JSON.stringify([lista[0]]),
+				headers: {
+					"Content-Type": "application/json"
+				}
+			});
+			const data = await resp.json();
+		} catch (error) {
+			console.log(`este es el ${error}`);
+		}
+		ApiFuntion();
+	}
 
 
-      } catch (error){ console.error(error)}
 
-}
-//para eliminar una tarea
-const handleDelete = (taskId) => {
-   const updatedTasks = tasksList.filter(task => task.label !== taskId);
-  updatedTasks.splice(taskId, 0);
-  setTasksList(updatedTasks);
+
+
+	return <>
+		<h1 className="title text-center mt-5">Todos</h1>
+		<Card className="d-flex" body>
+			<div className="row m-3">
+				<input className="inputEdit col-12" onKeyUp={async (evt) => {
+					if (evt.key == 'Enter') {
+						const nuevalista = [...lista, { label: evt.target.value, done: false }]
+						evt.target.value = ""
+						await agregartarea(nuevalista);
+
+					}
+				}}
+					type="text" placeholder="whats need to be done?" defaultValue={lista.label}
+				/>
+			</div>
+
+
+			{lista.map((item, ind) => {
+				if (ind > 0) {
+					return <div key={ind}>
+						{/* <li key={item.label}>{item.label}</li> */}
+						<div onMouseEnter={() => setHover(ind)} className="row m-2" >
+							<h5 className="col-11 text-secondary" key={item.label}>{item.label}</h5>
+							{hover == ind && <button className="botonEdit col-1" onClick={async () => {
+								borrarTarea(ind)
+							}} >x</button>}
+						</div>
+
+					</div>
+				}
+			})}
+
+
+			<div>
+				<span className="m-5">{lista.length -1} Item left</span>
+				<Button className="ms-5" variant="primary" onClick={deleteReinicio} >Delete all</Button>
+			</div>
+		</Card >
+
+	</>
 };
 
-
-// const handleDelete = (index) => {
-//   const updatedTasks = [...tasksList];
-//   updatedTasks.splice(index, 1);
-//   setTasksList(updatedTasks);
-// };
-
-const handleDeleteAllTasks = async () => {
-  try {
-    
-    const response = await fetch('https://playground.4geeks.com/apis/fake/todos/user/clisdermar', {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
-      
-      setTasksList([]);
-
-      console.log('Todas las tareas han sido eliminadas correctamente');
-    } else {
-      console.error('Error al eliminar todas las tareas:', response.statusText);
-    }
-  } catch (error) {
-    console.error('Error al eliminar todas las tareas:', error);
-  }
-};
-
-useEffect(()=>{
-      putList()
-},[tasksList])
-
-useEffect (()=> {
- getTasksLista();
-},[])
-
-  const remainingTasks = tasksList.length;
-
-  return (
-    <div className="container">
-      <div>
-        <h1>Todos</h1>
-      </div>
-      <div className="card">
-        <div className="card-body">
-          <form onSubmit={AddTask}>
-            <input
-              type="text"
-              placeholder="What needs to be done?"
-              value={task.label}
-              onChange={handleChange}
-              style={{ border: 'none', outline: 'none', marginBottom: '10px' }}
-            />
-          </form>
-
-          <ul className="list-group">
-            {tasksList.map((taskItem, index) => (
-              <li
-                className="list-group-item"
-                key={index}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                {taskItem.label}
-
-                {hoveredIndex === index && (
-                  <button className="delete-button" onClick={() => handleDelete(taskItem.label)}>
-                    <FontAwesomeIcon icon={faTimes} style={{ color: '#f03405' }} />
-                  </button>
-                  
-                )}
-                
-
-              </li>
-              
-            ))}
-              <button onClick={handleDeleteAllTasks}>Eliminar todas las tareas</button>
-
-            {remainingTasks > 0 && (
-              <li className="list-group-item">
-                <strong>{remainingTasks} item left</strong>
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default TodoLista
+export default TodoLista;
