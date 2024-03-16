@@ -16,13 +16,7 @@ const agregarUsuario = async () => {
     try {
         const response = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
             method: "POST",
-            body: JSON.stringify({
-                full_name: "Nombre del Usuario",
-                email: "correo@example.com",
-                agenda_slug: "agenda_slug_del_usuario",
-                address: "Dirección del Usuario",
-                phone: "Número de Teléfono del Usuario"
-            }),
+            body: JSON.stringify([]),
             headers: {
                 "Content-Type": "application/json"
             }
