@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 
 
-
 const TodoLista = () => {
 	const [hover, setHover] = useState(false)
 	const [lista, setLista] = useState([{
@@ -13,6 +12,31 @@ const TodoLista = () => {
 		"done": false
 	}])
 
+const agregarUsuario = async () => {
+    try {
+        const response = await fetch("https://playground.4geeks.com/apis/fake/todos/user/clisdermar", {
+            method: "POST",
+            body: JSON.stringify({
+                full_name: "Nombre del Usuario",
+                email: "correo@example.com",
+                agenda_slug: "agenda_slug_del_usuario",
+                address: "Dirección del Usuario",
+                phone: "Número de Teléfono del Usuario"
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (response.ok) {
+            console.log("Usuario agregado correctamente.");
+           
+        } else {
+            console.error("Error al agregar usuario:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error al agregar usuario:", error);
+    }
+};
 
 
 	const ApiFuntion = async () => {
@@ -81,10 +105,6 @@ const TodoLista = () => {
 		}
 		ApiFuntion();
 	}
-
-
-
-
 
 	return (
 		<div className="container">
